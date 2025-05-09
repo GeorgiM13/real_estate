@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Търсене на имоти</title>
+  <link rel="stylesheet" href="./styles/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="homepage.html">Търсене на имоти</a>
+    <a href="add_property.html">Публикуване на обява</a>
+    <a href="#">Моят профил</a>
+    <a href="#">Информация</a>
+  </nav>
+
+  <div class="search-container-wrapper">
+    <div class="search-container">
+      <div class="left-section">
+        <div class="toggle-buttons">
+          <button id="btn-sale" class="active">Продажби</button>
+          <button id="btn-rent" class="inactive">Наеми</button>
+        </div>
+
+        <label>Местоположение</label>
+        <select id="filter-location">
+          <option value="choose">Избери</option>
+          <option value="Варна">Варна</option>
+          <option value="София">София</option>
+          <option value="Плевен">Плевен</option>
+          <option value="Стара Загора">Стара Загора</option>
+          <option value="Русе">Русе</option>
+          <option value="Добрич">Добрич</option>
+          <option value="Бургас">Бургас</option>
+          <option value="Шумен">Шумен</option>
+        </select>
+
+        <div class="map">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1500843.1764453687!2d24.221632365584668!3d42.717813940823206!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40a8fec1c85bf089%3A0xa01269bf4c10!2sBulgaria!5e0!3m2!1sen!2sbg!4v1746467095869!5m2!1sen!2sbg" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      </div>
+      
+      <div class="right-section">
+    
+        <label>Вид имот</label>
+        <select id="filter-type">
+          <option value="choose">Избери</option>
+          <option value="Двустаен">Двустаен</option>
+          <option value="Тристаен">Тристаен</option>
+          <option value="Четиристаен">Четиристаен</option>
+          <option value="Къща">Къща</option>
+        </select>
+        <div class="form-group">
+        <label class="pricelabel">Цена</label>
+        <div class="input-row">
+          <input id="filter-price-min" type="number" placeholder="€ От">
+          <input id="filter-price-max" type="number" placeholder="€ До">
+        </div>
+        </div>
+        <div class="form-group">
+        <label>Цена на кв.м.</label>
+        <div class="input-row">
+          <input id="filter-ppsqm-min" type="number" placeholder="€ От">
+          <input id="filter-ppsqm-max" type="number" placeholder="€ До">
+        </div>
+      </div>
+        <div class="form-group">
+        <label>Квадратура</label>
+        <div class="input-row">
+          <input id="filter-area-min" type="number" placeholder="От">
+          <input id="filter-area-max" type="number" placeholder="До">
+        </div>
+      </div>
+        <a href="results.html">
+          <button class="search-btn">Търсене</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+        const btnSale = document.getElementById("btn-sale");
+        const btnRent = document.getElementById("btn-rent");
+
+        btnSale.addEventListener("click", function () {
+          btnSale.classList.add("active");
+          btnSale.classList.remove("inactive");
+          btnRent.classList.add("inactive");
+          btnRent.classList.remove("active");
+          });
+
+        btnRent.addEventListener("click", function () {
+          btnRent.classList.add("active");
+          btnRent.classList.remove("inactive");
+          btnSale.classList.add("inactive");
+          btnSale.classList.remove("active");
+          });
+    document.querySelector(".search-btn").addEventListener("click", function () {
+
+
+      function validateNumber(value, fieldName){
+        if(value < 0) {
+          alert(fieldName + " не може да бъде отрицателно число");
+          return false;
+        }
+        return true;
+      }
+
+        if (!validateNumber(parseFloat(document.getElementById("filter-price-min").value), "Минимална цена") || !validateNumber(parseFloat(document.getElementById("filter-price-max").value), "Максимална цена")) {
+          event.preventDefault(); 
+          return;
+        }
+
+        if (!validateNumber(parseFloat(document.getElementById("filter-ppsqm-min").value), "Минимална цена на кв.м.") || !validateNumber(parseFloat(document.getElementById("filter-ppsqm-max").value), "Максимална цена на кв.м.")) {
+          event.preventDefault(); 
+          return;
+        }
+
+        if (!validateNumber(parseFloat(document.getElementById("filter-area-min").value), "Минимална квадратура") || !validateNumber(parseFloat(document.getElementById("filter-area-max").value), "Максимална квадратура")) {
+          event.preventDefault(); 
+          return;
+        }
+
+
+      const filters = {
+        location: document.getElementById("filter-location").value,
+        type: document.getElementById("filter-type").value,
+        priceMin: document.getElementById("filter-price-min").value,
+        priceMax: document.getElementById("filter-price-max").value,
+        areaMin: document.getElementById("filter-area-min").value,
+        areaMax: document.getElementById("filter-area-max").value,
+        ppsqmMin: document.getElementById("filter-ppsqm-min").value,
+        ppsqmMax: document.getElementById("filter-ppsqm-max").value,
+        offerType: btnSale.classList.contains("active") ? "Продажба" : "Наем"
+      };
+      localStorage.setItem("filters", JSON.stringify(filters));
+      window.location.href = "results.html";
+    });
+  </script>
+
+</body>
+</html>

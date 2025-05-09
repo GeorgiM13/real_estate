@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добави обява за имот</title>
+  <link rel="stylesheet" href="./styles/style3.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="homepage.html">Търсене на имоти</a>
+    <a href="#">Публикуване на обява</a>
+    <a href="#">Моят профил</a>
+    <a href="#">Информация</a>
+  </nav>
+
+  <main class="form-container">
+    <h2>Добави нов имот</h2>
+    <form id="property-form" enctype="multipart/form-data">
+      <label>Местоположение</label>
+        <select id="location" name="location" required>
+          <option value="choose">Избери</option>
+          <option value="Варна">Варна</option>
+          <option value="София">София</option>
+          <option value="Плевен">Плевен</option>
+          <option value="Стара Загора">Стара Загора</option>
+          <option value="Русе">Русе</option>
+          <option value="Добрич">Добрич</option>
+          <option value="Бургас">Бургас</option>
+          <option value="Шумен">Шумен</option>
+        </select>
+
+
+      <label>Вид имот:
+        <select id="type" name="type" required>
+          <option value="">Избери</option>
+          <option value="two_bedroom">Двустаен</option>
+          <option value="three_bedroom">Тристаен</option>
+          <option value="four_bedroom">Четиристаен</option>
+          <option value="house">Къща</option>
+        </select>
+      </label>
+
+      <label>Тип оферта:</label>
+      <div class="toggle-buttons" id="offer-toggle">
+        <button type="button" class="offer-button active" data-value="Продажба">Продажба</button>
+        <button type="button" class="offer-button" data-value="Наем">Наем</button>
+      </div>
+      <input type="hidden" name="offerType" id="offerType" value="Продажба">
+      <label>Квадратура (кв.м):
+        <input type="number" id="area" name="area" min="1" required>
+      </label>
+
+      <label>Цена (€):
+        <input type="number" id="price" name="price" min="0" required>
+      </label>
+
+      <label>Качете снимки:
+        <input type="file" id="images" name="images" multiple accept="image/*" required>
+      </label>
+
+      <label>Описание:
+        <textarea id="description" name="description"></textarea>
+      </label>
+
+      <button type="submit">Запази имота</button>
+    </form>
+  </main>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const offerButtons = document.querySelectorAll(".offer-button");
+    const offerInput = document.getElementById("offerType");
+
+    offerButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        offerButtons.forEach(b => b.classList.remove("active"));
+        button.classList.add("active");
+        offerInput.value = button.dataset.value;
+      });
+    });
+
+    document.getElementById("property-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const form = document.getElementById("property-form");
+      const formData = new FormData(form);
+      
+
+      try {
+        
+        const response = await fetch("http://localhost:3000/api/properties", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error("Грешка при качване на имота.");
+        }
+
+        const result = await response.json();
+        alert("Имотът е добавен успешно!");
+        window.location.href = "results.html";
+      } catch (error) {
+        alert("Грешка: " + error.message);
+      }
+    });
+  });
+  </script>
+</body>
+</html>

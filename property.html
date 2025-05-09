@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Детайли за имот</title>
+  <link rel="stylesheet" href="./styles/style4.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="homepage.html">Търсене на имоти</a>
+    <a href="add_property.html">Публикуване на обява</a>
+    <a href="#">Моят профил</a>
+    <a href="#">Информация</a>
+  </nav>
+
+  <main class="property-detail">
+    <div class="gallery">
+      
+      <img id="main-image" src="" alt="Голямо изображение" class="main-image">
+      
+      
+      <div class="thumbnails" id="thumbnail-gallery"></div>
+    </div>
+
+    <div class="info" id="property-info">
+      
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const propertyId = urlParams.get("id");
+  
+      let property = null;
+  
+      
+      try {
+        const res = await fetch(`http://localhost:3000/api/properties/${propertyId}`);
+        if (!res.ok) throw new Error("Неуспешно зареждане от сървъра");
+        property = await res.json();
+      } catch (error) {
+        console.error("Грешка при зареждане:", error);
+        document.querySelector("#property-info").innerHTML = "<p>Имотът не е намерен.</p>";
+        return;
+      }
+  
+      
+      const mainImage = document.getElementById("main-image");
+      const thumbnailGallery = document.getElementById("thumbnail-gallery");
+      
+      if (property.images && property.images.length > 0) {
+        
+        mainImage.src = `http://localhost:3000${property.images[0]}`;
+        
+        
+        property.images.forEach((src, index) => {
+          const thumbnail = document.createElement("img");
+          thumbnail.src = `http://localhost:3000${src}`;
+          thumbnail.alt = `Снимка ${index + 1}`;
+          thumbnail.classList.add("thumbnail");
+          
+         
+          thumbnail.addEventListener("click", () => {
+            mainImage.src = thumbnail.src;
+          });
+          
+          thumbnailGallery.appendChild(thumbnail);
+        });
+      }
+
+     
+      const info = document.getElementById("property-info");
+      const price = parseFloat(property.price);
+      const area = parseFloat(property.area);
+      const pricePerSqM = (price && area) ? (price / area).toFixed(2) : "N/A";
+
+      info.innerHTML = `
+        <h2>${getPropertyTypeName(property.type)}</h2>
+        <p><strong>Локация:</strong> ${property.location}</p>
+        <p><strong>Квадратура:</strong> ${property.area} кв.м</p>
+        <p><strong>Цена:</strong> € ${parseInt(property.price).toLocaleString("bg-BG")}</p>
+        <p><strong>Цена на кв.м:</strong> € ${pricePerSqM}</p>
+        <hr class="separator">
+        <p><strong>Описание:</strong> ${property.description || "Няма добавено описание."}</p>
+      `;
+    });
+
+    function getPropertyTypeName(type) {
+      switch (type) {
+        case "two_bedroom": return "Двустаен апартамент";
+        case "three_bedroom": return "Тристаен апартамент";
+        case "four_bedroom": return "Четиристаен апартамент";
+        case "house": return "Къща";
+        default: return "Неизвестен тип";
+      }
+    }
+  </script>
+</body>
+</html>

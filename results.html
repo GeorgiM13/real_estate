@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Списък с имоти</title>
+    <link rel="stylesheet" href="./styles/style2.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="homepage.html">Търсене на имоти</a>
+        <a href="add_property.html">Публикуване на обява</a>
+        <a href="#">Моят профил</a>
+        <a href="#">Информация</a>
+    </nav>
+    <main class="content">
+        <div class="map">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1500843.1764453687!2d24.221632365584668!3d42.717813940823206!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40a8fec1c85bf089%3A0xa01269bf4c10!2sBulgaria!5e0!3m2!1sen!2sbg!4v1746467095869!5m2!1sen!2sbg" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="listings" id="property-listings">
+        </div>
+        <div id="no-results" style="display:none; padding: 2rem; font-size: 1.2rem; color: #555;">
+            Няма намерени резултати по зададените критерии.
+        </div>
+    </main>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+    const listingsContainer = document.getElementById("property-listings");
+
+    try {
+        const response = await fetch("http://localhost:3000/api/properties");
+        const properties = await response.json();
+
+        if (!Array.isArray(properties)) throw new Error("Невалидни данни от сървъра");
+
+        let visibleCount = 0;
+        const filters = JSON.parse(localStorage.getItem("filters"));
+
+        properties.forEach((property) => {
+            const mainImage = "http://localhost:3000" + property.images?.[0];
+            const cardLocation = property.location;
+            const cardType = getPropertyTypeName(property.type);
+            const price = parseInt(property.price) || 0;  
+            const area = parseInt(property.area) || 0;  
+            const pricePerSqM = (area && price) ? (price / area).toFixed(2) : null;
+
+            const matchesOfferType = !filters || !filters.offerType || property.offerType === filters.offerType;
+            const matchesLocation = !filters || filters.location === "choose" || filters.location === cardLocation;
+            const matchesType = !filters || filters.type === "choose" || filters.type === cardType;
+            const priceMin = parseInt(filters?.priceMin) || 0;
+            const priceMax = parseInt(filters?.priceMax) || Infinity;
+            const areaMin = parseInt(filters?.areaMin) || 0;
+            const areaMax = parseInt(filters?.areaMax) || Infinity;
+            const ppsqmMin = parseFloat(filters?.ppsqmMin);
+            const ppsqmMax = parseFloat(filters?.ppsqmMax);
+
+            
+
+            const matchesPrice = price >= priceMin && price <= priceMax;
+            const matchesArea = area >= areaMin && area <= areaMax;
+            const matchesPPSQM = (pricePerSqM !== null) && (isNaN(ppsqmMin) || pricePerSqM >= ppsqmMin) && (isNaN(ppsqmMax) || pricePerSqM <= ppsqmMax);
+
+            const isVisible = matchesOfferType && matchesLocation && matchesType && matchesPrice && matchesArea && matchesPPSQM;
+
+            if (!isVisible) return;
+            visibleCount++;
+
+            const a = document.createElement("a");
+            a.href = `property.html?id=${property._id}`;
+            a.innerHTML = `
+                <div class="property" data-location="${cardLocation}" data-type="${cardType}">
+                    <img src="${mainImage}" alt="Снимка на имот">
+                    <div class="info">
+                        <p>${property.location} | ${property.area} кв.м</p>
+                        <h4>€ ${price.toLocaleString("bg-BG")}</h4>
+                        <small>${cardType} • ${pricePerSqM} €/м²</small>
+                    </div>
+                </div>
+            `;
+            listingsContainer.appendChild(a);
+        });
+
+        document.getElementById("no-results").style.display = visibleCount === 0 ? "block" : "none";
+
+    } catch (err) {
+        console.error("Грешка при зареждане на имотите:", err);
+    }
+
+    function getPropertyTypeName(type) {
+        switch (type) {
+            case "two_bedroom": return "Двустаен";
+            case "three_bedroom": return "Тристаен";
+            case "four_bedroom": return "Четиристаен";
+            case "house": return "Къща";
+            default: return "Неизвестен тип";
+        }
+    }
+});
+
+    </script>
+</body>
+</html>

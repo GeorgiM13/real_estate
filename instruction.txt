@@ -1,0 +1,5 @@
+terminal -> mongod
+
+other terminal -> cd backend
+               -> node server.js
+               
