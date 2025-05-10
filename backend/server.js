@@ -26,8 +26,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+//mongodb+srv://admin:Georgi2003@cluster0.bclamgm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 
-mongoose.connect('mongodb://localhost:27017/realestate', {
+mongoose.connect('mongodb+srv://admin:Georgi2003@cluster0.bclamgm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
