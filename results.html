@@ -28,7 +28,7 @@
     const listingsContainer = document.getElementById("property-listings");
 
     try {
-        const response = await fetch("http://localhost:3000/api/properties");
+        const response = await fetch("https://real-estate-jaea.onrender.com/api/properties");
         const properties = await response.json();
 
         if (!Array.isArray(properties)) throw new Error("Невалидни данни от сървъра");
@@ -37,7 +37,7 @@
         const filters = JSON.parse(localStorage.getItem("filters"));
 
         properties.forEach((property) => {
-            const mainImage = "http://localhost:3000" + property.images?.[0];
+            const mainImage = "https://real-estate-jaea.onrender.com" + property.images?.[0];
             const cardLocation = property.location;
             const cardType = getPropertyTypeName(property.type);
             const price = parseInt(property.price) || 0;  

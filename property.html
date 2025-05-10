@@ -37,7 +37,7 @@
   
       
       try {
-        const res = await fetch(`http://localhost:3000/api/properties/${propertyId}`);
+        const res = await fetch(`https://real-estate-jaea.onrender.com/api/properties/${propertyId}`);
         if (!res.ok) throw new Error("Неуспешно зареждане от сървъра");
         property = await res.json();
       } catch (error) {
@@ -52,12 +52,12 @@
       
       if (property.images && property.images.length > 0) {
         
-        mainImage.src = `http://localhost:3000${property.images[0]}`;
+        mainImage.src = `https://real-estate-jaea.onrender.com${property.images[0]}`;
         
         
         property.images.forEach((src, index) => {
           const thumbnail = document.createElement("img");
-          thumbnail.src = `http://localhost:3000${src}`;
+          thumbnail.src = `https://real-estate-jaea.onrender.com${src}`;
           thumbnail.alt = `Снимка ${index + 1}`;
           thumbnail.classList.add("thumbnail");
           
